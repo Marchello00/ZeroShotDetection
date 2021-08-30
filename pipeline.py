@@ -1,24 +1,49 @@
 import logging
+from collections import defaultdict
 
 import numpy as np
-import torch
+import PIL
 
-from classifier import get_categories_probs, imagenet_classes
+from region_proposal import predict_regions, filter_regions
+from classifier import get_categories_probs
 from text_processor import find_categories_in_text
 
 logger = logging.getLogger(__name__)
 
 
-def search_on_image(image, text):
-    probs = get_categories_probs(image)
+def pil_to_cv2(image: PIL.Image):
+    return np.array(image.convert('RGB'))
 
-    top5_prob, top5_catid = torch.topk(probs, 5)
-    logger.info("image classifiaction top-5:")
-    for i in range(top5_prob.size(0)):
-        logger.info(
-            f"{i}: {imagenet_classes['standart_en'][top5_catid[i]]} {top5_prob[i].item()}")
 
-    query_en, query_ru = find_categories_in_text(text)
+def search_on_image(image: PIL.Image,
+                    text: str,
+                    classification_threshold=0.2,
+                    overlap_threshold=0.7,
+                    same_class_overlap_threshold=0.3):
+    regions = predict_regions(pil_to_cv2(image))
+    regions = filter_regions(regions, threshold=overlap_threshold)
 
-    return [(cat, float(probs[cat]), 0.1, 0.1, 0.9, 0.9) for cat in
-            np.concatenate((query_en, query_ru)) if probs[cat] > 0.2]
+    query = find_categories_in_text(text)
+    if not query:
+        return []
+
+    detections = []
+    for region in regions:
+        cropped = image.crop(box=region.unwrap())
+        probs = get_categories_probs(cropped)[query]
+        winner_id = probs.argmax()
+        if probs[winner_id] > classification_threshold:
+            region.probability = probs[winner_id]
+            region.idx = query[winner_id]
+            detections.append(region)
+
+    # remove everything that overlaps significantly
+    # among detections of the same class
+    detections_by_category = defaultdict(list)
+    for detection in detections:
+        detections_by_category[detection.idx].append(detection)
+    detections = []
+    for cat, cat_detections in detections_by_category.items():
+        detections += filter_regions(cat_detections,
+                                     threshold=same_class_overlap_threshold)
+    return detections

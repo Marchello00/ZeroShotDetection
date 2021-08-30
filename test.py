@@ -27,17 +27,46 @@ def test_respond():
 
     result = requests.post(url, json=request_data).json()
 
-    gold_result = {
-        'detected_objects': [
-            [
-                ['Samoyed', 'Самоед', 0.8238474130630493, 0.1, 0.1, 0.9, 0.9]
-            ],
-            [
-                ['Samoyed', 'Самоед', 0.8238474130630493, 0.1, 0.1, 0.9, 0.9]
-            ],
-            []
-        ]
-    }
+    gold_result = {'detected_objects': [
+        [
+            {
+                'l': 27.127676010131836,
+                'u': 0.0,
+                'r': 1039.8526611328125,
+                'd': 1032.8140869140625,
+                'label_en': 'Samoyed',
+                'label_ru': 'Самоед',
+            },
+            {
+                'l': 386.8840637207031,
+                'u': 407.98443603515625,
+                'r': 1546.0,
+                'd': 1144.8740234375,
+                'label_en': 'Great Pyrenees',
+                'label_ru': 'Великие Пиренеи',
+            }
+        ],
+        [
+            {
+                'l': 27.127676010131836,
+                'u': 0.0,
+                'r': 1039.8526611328125,
+                'd': 1032.8140869140625,
+                'label_en': 'Samoyed',
+                'label_ru': 'Самоед',
+            },
+            {
+                'l': 386.8840637207031,
+                'u': 407.98443603515625,
+                'r': 1546.0,
+                'd': 1144.8740234375,
+                'label_en': 'Great Pyrenees',
+                'label_ru': 'Великие Пиренеи',
+            }
+        ],
+        []
+    ]}
+
     digits = 2
     result = round_struct(result, digits)
     gold_result = round_struct(gold_result, digits)
