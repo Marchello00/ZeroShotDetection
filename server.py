@@ -34,13 +34,12 @@ def respond():
     for text, img_path in zip(texts, img_paths):
         try:
             image = Image.open(img_path)
-            results_id = search_on_image(image, text)
-            results.append([(
-                imagenet_classes["standart_en"][idx],
-                imagenet_classes["standart_ru"][idx],
-                prob,
-                l, u, r, d
-            ) for idx, prob, l, u, r, d in results_id])
+            results_local = search_on_image(image, text)
+            results.append([
+                {"label_en": imagenet_classes["standart_en"][region.idx],
+                 "label_ru": imagenet_classes["standart_ru"][region.idx],
+                 "l": region.l, "u": region.u, "r": region.r, "d": region.d}
+                for region in results_local])
         except Exception as exc:
             logger.exception(exc)
             sentry_sdk.capture_exception(exc)

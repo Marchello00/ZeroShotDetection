@@ -11,6 +11,7 @@ from helpers import log_exceptions
 logger = logging.getLogger(__name__)
 
 with log_exceptions(logger):
+    logger.info("loading image classifier...")
     classifier = inception_v3(pretrained=True).to(device)
     classifier.eval()
 
@@ -27,6 +28,8 @@ with log_exceptions(logger):
     with open('imagenet_classes.json', 'r') as f:
         imagenet_classes = json.load(f)
 
+    logger.info("image classifier loaded!")
+
 
 def get_categories_probs(input_image):
     input_tensor = preprocess(input_image)
@@ -35,5 +38,4 @@ def get_categories_probs(input_image):
     with torch.no_grad():
         output = classifier(input_batch)
 
-    probs = torch.nn.functional.softmax(output[0], dim=0)
-    return probs.to('cpu')
+    return torch.nn.functional.softmax(output[0], dim=0).cpu()

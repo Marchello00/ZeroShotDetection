@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:experimental
 
-FROM pytorch/pytorch:1.9.0-cuda10.2-cudnn7-runtime
+FROM pytorch/pytorch:1.8.1-cuda10.2-cudnn7-runtime
 
 WORKDIR /src
 
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get -y install gcc ffmpeg libsm6 libxext6
 COPY ./requirements.txt /src/requirements.txt
 RUN pip install -r /src/requirements.txt
 
-RUN python -c 'from torchvision.models import inception_v3; inception_v3(pretrained=True);'
+COPY ./docker_cache_models.py /src/docker_cache_models.py
+RUN python /src/docker_cache_models.py
 
 COPY . /src
 
