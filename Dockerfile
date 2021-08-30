@@ -7,7 +7,8 @@ WORKDIR /src
 ARG SERVICE_PORT
 ENV SERVICE_PORT ${SERVICE_PORT}
 
-RUN apt-get update && apt-get -y install gcc
+# gcc for detectron2, ffmpeg/libsm6/libxext6 for opencv (https://stackoverflow.com/a/63377623)
+RUN apt-get update && apt-get -y install gcc ffmpeg libsm6 libxext6
 
 COPY ./requirements.txt /src/requirements.txt
 RUN pip install -r /src/requirements.txt
