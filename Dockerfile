@@ -1,11 +1,13 @@
 # syntax=docker/dockerfile:experimental
 
-FROM pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
+FROM pytorch/pytorch:1.9.0-cuda10.2-cudnn7-runtime
 
 WORKDIR /src
 
 ARG SERVICE_PORT
 ENV SERVICE_PORT ${SERVICE_PORT}
+
+RUN apt-get update && apt-get -y install gcc
 
 COPY ./requirements.txt /src/requirements.txt
 RUN pip install -r /src/requirements.txt
