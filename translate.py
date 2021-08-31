@@ -12,10 +12,10 @@ with log_exceptions(logger):
     logger.info("preparing translator")
     translator_en_ru = pipeline(task='translation',
                                 model='Helsinki-NLP/opus-mt-en-ru',
-                                device=device)
+                                device=-1 if device.type == 'cpu' else 0)
     translator_ru_en = pipeline(task='translation',
                                 model='Helsinki-NLP/opus-mt-ru-en',
-                                device=device)
+                                device=-1 if device.type == 'cpu' else 0)
     logger.info("translator is ready")
 
 

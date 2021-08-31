@@ -37,5 +37,7 @@ Mystem()
 SentenceTransformer('sentence-transformers/bert-base-nli-mean-tokens')
 
 # Translator
-pipeline(task='translation', model='Helsinki-NLP/opus-mt-en-ru', device=device)
-pipeline(task='translation', model='Helsinki-NLP/opus-mt-ru-en', device=device)
+pipeline(task='translation', model='Helsinki-NLP/opus-mt-en-ru',
+         device=-1 if device == 'cpu' else 0)
+pipeline(task='translation', model='Helsinki-NLP/opus-mt-ru-en',
+         device=-1 if device == 'cpu' else 0)

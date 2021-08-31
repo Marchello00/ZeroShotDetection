@@ -23,6 +23,7 @@ def search_on_image(image: Image,
                     n_predictions_for_region=3):
     if has_cyrillic(text):
         text = translate_ru_en([text])[0]
+        logger.info(f"russian text was translated: {text}")
 
     regions = predict_regions(pil_to_cv2(image))
     regions = filter_regions(regions, threshold=overlap_threshold)
