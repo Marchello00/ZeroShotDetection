@@ -34,7 +34,8 @@ def respond():
     for text, img_path in zip(texts, img_paths):
         try:
             image = Image.open(img_path)
-            results_local = search_on_image(image, text)
+            results_local = search_on_image(image, text,
+                                            region_compress_size=None)
             results.append([
                 {"label_en": imagenet_classes["standart_en"][region.idx],
                  "label_ru": imagenet_classes["standart_ru"][region.idx],

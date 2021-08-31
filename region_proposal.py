@@ -1,11 +1,13 @@
 import logging
 
 import numpy as np
+from PIL.Image import Image
+
 from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 
-from helpers import log_exceptions
+from helpers import log_exceptions, pil_to_cv2
 from global_init import device
 from region import Region
 
@@ -25,6 +27,15 @@ with log_exceptions(logger):
     logger.info("region proposal network is ready")
 
 
+def predict_regions_compressed(image: Image, size=(300, 300)):
+    compressed = image.resize(size) if size is not None else image
+    regions = predict_regions(pil_to_cv2(compressed))
+    if size is not None:
+        for region in regions:
+            region.resize(image.width, image.height)
+    return regions
+
+
 def predict_regions(image: np.ndarray):
     """
     Predict regions with objects using Region Proposal Network
@@ -35,8 +46,8 @@ def predict_regions(image: np.ndarray):
     logger.info("proposing regions...")
     outputs = rpn(image)
     logger.info("proposing regions done!")
-    return [Region(*box.cpu().numpy()) for box in
-            outputs["proposals"].proposal_boxes]
+    return [Region(*box.cpu().numpy(), image.shape[0], image.shape[1]) for box
+            in outputs["proposals"].proposal_boxes]
 
 
 def iou(region1: Region, region2: Region):

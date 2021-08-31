@@ -1,31 +1,27 @@
 import logging
 from collections import defaultdict
 
-import numpy as np
-import PIL
+from PIL.Image import Image
 
-from region_proposal import predict_regions, filter_regions
+from region_proposal import predict_regions_compressed, filter_regions
 from classifier import get_categories_probs
 from text_processor import find_categories_in_text
 
 logger = logging.getLogger(__name__)
 
 
-def pil_to_cv2(image: PIL.Image):
-    return np.array(image.convert('RGB'))
-
-
-def search_on_image(image: PIL.Image,
+def search_on_image(image: Image,
                     text: str,
                     classification_threshold=0.2,
                     overlap_threshold=0.7,
-                    same_class_overlap_threshold=0.3):
-    regions = predict_regions(pil_to_cv2(image))
-    regions = filter_regions(regions, threshold=overlap_threshold)
-
+                    same_class_overlap_threshold=0.3,
+                    region_compress_size=(300, 300)):
     query = find_categories_in_text(text)
     if not query:
         return []
+
+    regions = predict_regions_compressed(image, size=region_compress_size)
+    regions = filter_regions(regions, threshold=overlap_threshold)
 
     detections = []
     for region in regions:

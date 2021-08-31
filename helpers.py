@@ -1,5 +1,12 @@
-import sentry_sdk
 from contextlib import contextmanager
+
+import sentry_sdk
+import numpy as np
+from PIL.Image import Image
+
+
+def pil_to_cv2(image: Image):
+    return np.array(image.convert('RGB'))
 
 
 @contextmanager
