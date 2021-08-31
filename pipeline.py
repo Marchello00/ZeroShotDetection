@@ -17,8 +17,8 @@ def search_on_image(image: Image,
                     text: str,
                     classification_threshold=0.2,
                     similarity_threshold=0.3,
-                    overlap_threshold=0.7,
-                    same_class_overlap_threshold=0.3,
+                    overlap_threshold=0.3,
+                    same_class_overlap_threshold=0.1,
                     n_predictions_for_region=3):
     regions = predict_regions(pil_to_cv2(image))
     regions = filter_regions(regions, threshold=overlap_threshold)
