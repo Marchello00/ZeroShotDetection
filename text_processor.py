@@ -1,6 +1,5 @@
 import logging
 
-import numpy as np
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from pymystem3 import Mystem

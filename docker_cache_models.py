@@ -9,6 +9,8 @@ from detectron2.config import get_cfg
 import nltk
 from pymystem3 import Mystem
 
+from sentence_transformers import SentenceTransformer
+
 # Inception_v3
 inception_v3(pretrained=True)
 
@@ -26,3 +28,6 @@ nltk.download('wordnet')
 nltk.download('punkt')
 nltk.download('stopwords')
 Mystem()
+
+# Sentence transformer
+SentenceTransformer('sentence-transformers/bert-base-nli-mean-tokens')
