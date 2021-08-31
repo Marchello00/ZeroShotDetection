@@ -9,6 +9,7 @@ from helpers import pil_to_cv2
 from region_proposal import predict_regions, filter_regions
 from classifier import get_categories_probs, get_cat_synset
 from similarity_check import get_similarities
+from translate import has_cyrillic, translate_ru_en
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +21,9 @@ def search_on_image(image: Image,
                     overlap_threshold=0.3,
                     same_class_overlap_threshold=0.1,
                     n_predictions_for_region=3):
+    if has_cyrillic(text):
+        text = translate_ru_en([text])[0]
+
     regions = predict_regions(pil_to_cv2(image))
     regions = filter_regions(regions, threshold=overlap_threshold)
 
@@ -47,7 +51,8 @@ def search_on_image(image: Image,
                 similarities[best_match] > similarity_threshold:
             region.probability = topn_prob[best_match]
             region.idx = topn_catid[best_match]
-            logger.info(f"approved best match: {get_cat_synset(region.idx)[0]}")
+            logger.info(
+                f"approved best match: {get_cat_synset(region.idx)[0]}")
             detections.append(region)
 
     # remove everything that overlaps significantly
