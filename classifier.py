@@ -28,6 +28,9 @@ with log_exceptions(logger):
     with open('imagenet_classes.json', 'r') as f:
         imagenet_classes = json.load(f)
 
+    with open('imagenet_labels/imagenet_labels.json', 'r') as f:
+        imagenet_synsets = json.load(f)
+
     logger.info("image classifier loaded!")
 
 
@@ -39,3 +42,7 @@ def get_categories_probs(input_image):
         output = classifier(input_batch)
 
     return torch.nn.functional.softmax(output[0], dim=0).cpu()
+
+
+def get_cat_synset(idx):
+    return imagenet_synsets[idx]
