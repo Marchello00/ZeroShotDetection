@@ -6,7 +6,7 @@ from PIL.Image import Image
 
 
 def pil_to_cv2(image: Image):
-    return np.array(image.convert('RGB'))
+    return np.array(image.convert('RGB'))[:, :, ::-1]
 
 
 @contextmanager
