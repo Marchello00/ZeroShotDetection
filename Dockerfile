@@ -1,16 +1,20 @@
 # syntax=docker/dockerfile:experimental
 
-FROM pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
+FROM pytorch/pytorch:1.8.1-cuda10.2-cudnn7-runtime
 
 WORKDIR /src
 
 ARG SERVICE_PORT
 ENV SERVICE_PORT ${SERVICE_PORT}
 
+# gcc for detectron2, ffmpeg/libsm6/libxext6 for opencv (https://stackoverflow.com/a/63377623)
+RUN apt-get update && apt-get -y install gcc ffmpeg libsm6 libxext6
+
 COPY ./requirements.txt /src/requirements.txt
 RUN pip install -r /src/requirements.txt
 
-RUN python -c 'from torchvision.models import inception_v3; inception_v3(pretrained=True);'
+COPY ./docker_cache_models.py /src/docker_cache_models.py
+RUN python /src/docker_cache_models.py
 
 COPY . /src
 
