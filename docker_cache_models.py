@@ -6,9 +6,6 @@ from detectron2 import model_zoo
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 
-import nltk
-from pymystem3 import Mystem
-
 from sentence_transformers import SentenceTransformer
 
 from transformers import pipeline
@@ -26,12 +23,6 @@ cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
     "COCO-Detection/rpn_R_50_FPN_1x.yaml")
 cfg.MODEL.DEVICE = device
 DefaultPredictor(cfg)
-
-# Text processing
-nltk.download('wordnet')
-nltk.download('punkt')
-nltk.download('stopwords')
-Mystem()
 
 # Sentence transformer
 SentenceTransformer('sentence-transformers/bert-base-nli-mean-tokens')

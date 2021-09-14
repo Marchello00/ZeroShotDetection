@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from copy import deepcopy
 
 import numpy as np
 import torch
@@ -14,16 +15,28 @@ from translate import has_cyrillic, translate_ru_en
 logger = logging.getLogger(__name__)
 
 
+def translate_labels(labels):
+    ru_labels = [label for label in labels if has_cyrillic(label)]
+    ru_inds = [i for i, label in enumerate(labels) if has_cyrillic(label)]
+
+    translated_labels = translate_ru_en(ru_labels)
+    logger.info(f"russian labels were translated: {translated_labels}")
+
+    en_labels = deepcopy(labels)
+    for ind, en_label in zip(ru_inds, en_labels):
+        en_labels[ind] = en_label
+
+    return en_labels
+
+
 def search_on_image(image: Image,
-                    text: str,
+                    labels,
                     classification_threshold=0.2,
                     similarity_threshold=0.3,
                     overlap_threshold=0.3,
                     same_class_overlap_threshold=0.1,
                     n_predictions_for_region=3):
-    if has_cyrillic(text):
-        text = translate_ru_en([text])[0]
-        logger.info(f"russian text was translated: {text}")
+    en_labels = translate_labels(labels)
 
     regions = predict_regions(pil_to_cv2(image))
     regions = filter_regions(regions, threshold=overlap_threshold)
@@ -44,23 +57,29 @@ def search_on_image(image: Image,
         logger.info("got top:")
         for i, (prob, idx) in enumerate(zip(topn_prob, topn_catid)):
             logger.info(f"{i}: {get_cat_synset(idx)[0]} {prob}")
-        similarities = get_similarities(text, [', '.join(get_cat_synset(idx))
-                                               for idx in topn_catid])
+        similarities = get_similarities(en_labels,
+                                        [', '.join(get_cat_synset(idx))
+                                         for idx in topn_catid])
         logger.info(f"similarities: {similarities}")
         best_match = np.array(similarities).argmax()
-        if topn_prob[best_match] > classification_threshold and \
-                similarities[best_match] > similarity_threshold:
+        best_match_classifier = best_match % n_predictions_for_region
+        best_match_label = best_match // n_predictions_for_region
+        if topn_prob[best_match_classifier] > classification_threshold and \
+                similarities[best_match_label][
+                    best_match_classifier] > similarity_threshold:
             region.probability = topn_prob[best_match]
             region.idx = topn_catid[best_match]
+            region.label = labels[best_match_label]
             logger.info(
-                f"approved best match: {get_cat_synset(region.idx)[0]}")
+                f"approved best match: {get_cat_synset(region.idx)[0]} " +
+                f"as label {en_labels[best_match_label]}")
             detections.append(region)
 
     # remove everything that overlaps significantly
     # among detections of the same class
     detections_by_category = defaultdict(list)
     for detection in detections:
-        detections_by_category[detection.idx].append(detection)
+        detections_by_category[detection.label].append(detection)
     detections = []
     for cat, cat_detections in detections_by_category.items():
         detections += filter_regions(cat_detections,
