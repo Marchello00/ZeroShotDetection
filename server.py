@@ -19,19 +19,23 @@ logging.getLogger("werkzeug").setLevel("WARNING")
 def respond():
     st_time = time.time()
 
-    logger.info(f"got request: {request.json}")
+    queries = request.json.get("queries", {})
+    image_folder = request.json.get("image_folder", ".")
+
+    logger.info(f"got request: image_folder={image_folder}, queries={queries}")
 
     results = {}
-    for img_path, labels in request.json.items():
+    for img, labels in queries.items():
         try:
+            img_path = f"{image_folder}/{img}"
             image = Image.open(img_path)
             results_local = search_on_image(image, labels)
-            results[img_path] = [[region.label, *region.to_xywh()]
-                                 for region in results_local]
+            results[img] = [[region.label, *region.to_xywh()]
+                            for region in results_local]
         except Exception as exc:
             logger.exception(exc)
             sentry_sdk.capture_exception(exc)
-            results[img_path] = []
+            results[img] = []
 
     total_time = time.time() - st_time
     logger.info(f"zero-shot object detection exec time: {total_time:.3f}s")
