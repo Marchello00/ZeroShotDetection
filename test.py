@@ -16,7 +16,10 @@ def test_respond():
     url = "http://0.0.0.0:8088/respond"
 
     request_data = {
-        "dog.jpg": ['dog', 'кот'],
+        "queries": {
+            "dog.jpg": ['dog', 'кот']
+        },
+        "image_folder": "."
     }
 
     result = requests.post(url, json=request_data).json()
