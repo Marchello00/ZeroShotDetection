@@ -64,8 +64,8 @@ def search_on_image(image: Image,
                                          for idx in topn_catid])
         logger.info(f"similarities: {similarities}")
         best_match = np.array(similarities).argmax()
-        best_match_classifier = best_match % n_predictions_for_region
-        best_match_label = best_match // n_predictions_for_region
+        best_match_classifier = best_match % len(topn_prob)
+        best_match_label = best_match // len(topn_prob)
         if topn_prob[best_match_classifier] > classification_threshold and \
                 similarities[best_match_label][
                     best_match_classifier] > similarity_threshold:
