@@ -21,6 +21,7 @@ with log_exceptions(logger):
 
 def get_similarities(labels, suggestions):
     sentences = labels + suggestions
+    logger.info(f"checking for similarities: labels={labels}, suggestions={suggestions}")
     embeddings = sentence_transformer.encode(sentences)
     return [[cosine(label, embedding)
              for embedding in embeddings[len(labels):]]
