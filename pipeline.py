@@ -25,7 +25,7 @@ def translate_labels(labels):
         translated_labels = translate_ru_en(ru_labels)
         logger.info(f"russian labels were translated: {translated_labels}")
 
-        for ind, en_label in zip(ru_inds, en_labels):
+        for ind, en_label in zip(ru_inds, translated_labels):
             en_labels[ind] = en_label
 
     return en_labels
