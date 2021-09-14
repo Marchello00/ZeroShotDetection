@@ -8,6 +8,7 @@ class Region:
         self.im_w = im_w
         self.probability = 0.0
         self.idx = 0
+        self.label = ""
 
     def resize(self, im_w, im_h):
         h_ratio = im_h / self.im_h
@@ -21,6 +22,9 @@ class Region:
 
     def unwrap(self):
         return self.l, self.u, self.r, self.d
+
+    def to_xywh(self):
+        return self.l, self.u, self.r - self.l, self.d - self.u
 
     def intersect(self, other):
         return Region(max(self.l, other.l),

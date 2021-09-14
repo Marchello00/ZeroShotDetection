@@ -19,8 +19,10 @@ with log_exceptions(logger):
     logger.info("sentence transformer is ready")
 
 
-def get_similarities(sentence, suggestions):
-    sentences = [sentence] + suggestions
+def get_similarities(labels, suggestions):
+    sentences = labels + suggestions
+    logger.info(f"checking for similarities: labels={labels}, suggestions={suggestions}")
     embeddings = sentence_transformer.encode(sentences)
-    return [cosine(embeddings[0], embedding) for embedding in
-            embeddings[1:]]
+    return [[cosine(label, embedding)
+             for embedding in embeddings[len(labels):]]
+            for label in embeddings[:len(labels)]]
