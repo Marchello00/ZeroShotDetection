@@ -69,8 +69,8 @@ def search_on_image(image: Image,
         if topn_prob[best_match_classifier] > classification_threshold and \
                 similarities[best_match_label][
                     best_match_classifier] > similarity_threshold:
-            region.probability = topn_prob[best_match]
-            region.idx = topn_catid[best_match]
+            region.probability = topn_prob[best_match_classifier]
+            region.idx = topn_catid[best_match_classifier]
             region.label = labels[best_match_label]
             logger.info(
                 f"approved best match: {get_cat_synset(region.idx)[0]} " +
