@@ -35,8 +35,8 @@ def search_on_image(image: Image,
                     labels,
                     classification_threshold=0.2,
                     similarity_threshold=0.3,
-                    overlap_threshold=0.3,
-                    same_class_overlap_threshold=0.1,
+                    overlap_threshold=0.5,
+                    same_class_overlap_threshold=0.3,
                     n_predictions_for_region=3):
     en_labels = translate_labels(labels)
 
