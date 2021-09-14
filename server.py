@@ -35,4 +35,4 @@ def respond():
 
     total_time = time.time() - st_time
     logger.info(f"zero-shot object detection exec time: {total_time:.3f}s")
-    return jsonify({"detected_objects": results})
+    return jsonify(results)

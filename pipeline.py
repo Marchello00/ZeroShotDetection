@@ -19,12 +19,14 @@ def translate_labels(labels):
     ru_labels = [label for label in labels if has_cyrillic(label)]
     ru_inds = [i for i, label in enumerate(labels) if has_cyrillic(label)]
 
-    translated_labels = translate_ru_en(ru_labels)
-    logger.info(f"russian labels were translated: {translated_labels}")
-
     en_labels = deepcopy(labels)
-    for ind, en_label in zip(ru_inds, en_labels):
-        en_labels[ind] = en_label
+
+    if ru_labels:
+        translated_labels = translate_ru_en(ru_labels)
+        logger.info(f"russian labels were translated: {translated_labels}")
+
+        for ind, en_label in zip(ru_inds, en_labels):
+            en_labels[ind] = en_label
 
     return en_labels
 
